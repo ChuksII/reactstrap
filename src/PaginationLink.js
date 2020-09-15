@@ -1,10 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import { mapToCssModules, tagPropType } from './utils';
+import React from "react";
+import PropTypes from "prop-types";
+import classNames from "classnames";
+import { mapToCssModules, tagPropType } from "./utils";
 
 const propTypes = {
-  'aria-label': PropTypes.string,
+  "aria-label": PropTypes.string,
+  "aria-disabled": PropTypes.string,
   children: PropTypes.node,
   className: PropTypes.string,
   cssModule: PropTypes.object,
@@ -16,8 +17,10 @@ const propTypes = {
 };
 
 const defaultProps = {
-  tag: 'a',
+  tag: "a",
 };
+
+const defaultAriaDisabled = "false";
 
 const PaginationLink = (props) => {
   let {
@@ -31,33 +34,38 @@ const PaginationLink = (props) => {
     ...attributes
   } = props;
 
-  const classes = mapToCssModules(classNames(
-    className,
-    'page-link'
-  ), cssModule);
+  const classes = mapToCssModules(
+    classNames(className, "page-link"),
+    cssModule
+  );
 
   let defaultAriaLabel;
   if (previous) {
-    defaultAriaLabel = 'Previous';
+    defaultAriaLabel = "Previous";
+    defaultAriaDisabled = "true";
   } else if (next) {
-    defaultAriaLabel = 'Next';
+    defaultAriaLabel = "Next";
+    defaultAriaDisabled = "false";
   } else if (first) {
-    defaultAriaLabel = 'First';
+    defaultAriaLabel = "First";
+    defaultAriaDisabled = "false";
   } else if (last) {
-    defaultAriaLabel = 'Last';
+    defaultAriaLabel = "Last";
+    defaultAriaDisabled = "false";
   }
 
-  const ariaLabel = props['aria-label'] || defaultAriaLabel;
+  const ariaLabel = props["aria-label"] || defaultAriaLabel;
+  const ariaDisabled = props["aria-disabled" || defaultAriaDisabled];
 
   let defaultCaret;
   if (previous) {
-    defaultCaret = '\u2039';
+    defaultCaret = "\u2039";
   } else if (next) {
-    defaultCaret = '\u203A';
+    defaultCaret = "\u203A";
   } else if (first) {
-    defaultCaret = '\u00ab';
+    defaultCaret = "\u00ab";
   } else if (last) {
-    defaultCaret = '\u00bb';
+    defaultCaret = "\u00bb";
   }
 
   let children = props.children;
@@ -65,36 +73,44 @@ const PaginationLink = (props) => {
     children = null;
   }
 
-  if (!attributes.href && Tag === 'a') {
-    Tag = 'button';
+  if (!attributes.href && Tag === "a") {
+    Tag = "button";
   }
 
   if (previous || next || first || last) {
     children = [
-      <span
-        aria-hidden="true"
-        key="caret"
-      >
+      <span aria-hidden="true" key="caret">
         {children || defaultCaret}
       </span>,
-      <span
-        className="sr-only"
-        key="sr"
-      >
+      <span className="sr-only" key="sr">
         {ariaLabel}
       </span>,
     ];
   }
 
-  return (
-    <Tag
-      {...attributes}
-      className={classes}
-      aria-label={ariaLabel}
-    >
-      {children}
-    </Tag>
-  );
+  if (previous) {
+    return (
+      <Tag
+        {...attributes}
+        className={classes}
+        aria-label={ariaLabel}
+        aria-disabled={ariaDisabled}
+      >
+        {children}
+      </Tag>
+    );
+  } else {
+    return (
+      <Tag
+        {...attributes}
+        className={classes}
+        aria-label={ariaLabel}
+        aria-disabled={ariaDisabled}
+      >
+        {children}
+      </Tag>
+    );
+  }
 };
 
 PaginationLink.propTypes = propTypes;
